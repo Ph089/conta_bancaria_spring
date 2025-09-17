@@ -3,46 +3,42 @@ package com.senai.conta_bancaria_spring.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
+import java.math.BigDecimal;
 
 @Data
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "tipo_conta", discriminatorType = DiscriminatorType.STRING, length = 20)
+@Table(name = "conta",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_conta_numero", columnNames = "numero"),
+                @UniqueConstraint(name = "uk_cliente_tipo", columnNames = {"cliente_id", "tipo_conta"})
+        }
+)
+@SuperBuilder
+@NoArgsConstructor
 public abstract class Conta {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    private Long numero;
+    @Column(nullable = false, length = 20)
+    private String numero;
 
-    private Double saldo;
+    @Column(nullable = false, precision = 4, scale = 2)
+    private BigDecimal saldo;
 
-    @ManyToOne
+    @Column(nullable = false)
+    private Boolean ativa;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cliente_id", foreignKey = @ForeignKey(name = "fk_conta_cliente"))
     private Cliente cliente;
 
-    private void depositar(Double valor){
-        if (valor > 0){
-            saldo += valor;
-        }else{
-            throw new IllegalArgumentException("Valor de depósito deve ser maior que zero");
 
-        }
-    }
-    private void sacar(Double valor){
-        if (valor > 0 && valor <= saldo){
-            saldo -= valor;
-        }else{
-            throw new IllegalArgumentException("Saldo insuficiente ou valor inválido");
-        }
-
-    }
-    private void transferir(Conta contaDestino, Double valor){
-        if (valor > 0 && valor <= saldo){
-            this.sacar(valor);
-            contaDestino.depositar(valor);
-        }else{
-            throw new IllegalArgumentException("Saldo insuficiente ou valor inválido");
-        }
-
-    }
 }
 

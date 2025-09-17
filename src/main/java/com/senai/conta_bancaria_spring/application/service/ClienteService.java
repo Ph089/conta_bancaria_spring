@@ -10,16 +10,5 @@ import java.util.List;
 @Service
 public class ClienteService {
 
-    private ClienteRepository clienteRepository;
 
-    public Cliente criarCliente(Cliente cliente) {
-        return clienteRepository.save(cliente);
-    }
-
-    public Cliente buscarClientePorId(String id) {
-        return clienteRepository.findById(id).orElse(null);
-    }
-    public List<Cliente> buscarTodosClientes() {
-        return clienteRepository.findAll();
-    }
 }

@@ -1,24 +1,27 @@
 package com.senai.conta_bancaria_spring.domain.entity;
 
 
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
+import java.math.BigDecimal;
 
 @Entity
+@DiscriminatorValue("POUPANCA")
 @Data
-public class ContaPoupanca extends Conta{
-    private double rendimento;
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class ContaPoupanca extends Conta {
+
+    @Column(precision = 10, scale = 4)
+    private BigDecimal rendimento;
 
 
-    private void sacar(Double valor) {
-        if (valor <= this.getSaldo()) {
-            this.setSaldo(this.getSaldo() - valor);
-        } else {
-            System.out.println("Saldo insuficiente");
-        }
-    }
-
-    private void aplicarRendimento() {
-        this.setSaldo(this.getSaldo() + (this.getSaldo() * rendimento));
-    }
 }
+

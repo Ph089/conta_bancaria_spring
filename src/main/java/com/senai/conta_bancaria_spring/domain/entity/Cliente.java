@@ -1,33 +1,43 @@
 package com.senai.conta_bancaria_spring.domain.entity;
 
-
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-
 @Data
-@MappedSuperclass
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Table(
+        name = "clientes",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_cliente_cpf", columnNames = "cpf")
+        }
+)
 public class Cliente {
 
-
-    @Id
+    @Id // Esta é a anotação correta para JPA/Hibernate
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @NotBlank(message = "Nome é obrigatório")
-    @Size(min = 3, max = 100, message = "O nome deve ter entre 3 e 100 caracteres")
+    @Column(nullable = false, length = 120)
     private String nome;
 
+    @Column(nullable = false, length = 11)
     private Long cpf;
 
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     private List<Conta> contas;
 
+    @Column(nullable = false)
+    private Boolean ativo;
 
 }
