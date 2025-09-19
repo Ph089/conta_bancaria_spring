@@ -32,7 +32,7 @@ public class Cliente {
     private String nome;
 
     @Column(nullable = false, length = 11)
-    private Long cpf;
+    private String cpf;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     private List<Conta> contas;
