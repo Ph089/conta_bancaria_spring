@@ -14,6 +14,7 @@ public record ClienteRegistroDTO(
 ) {
     public Cliente toEntity() {
         return Cliente.builder()
+                .ativo(true)
                 .nome(this.nome)
                 .cpf(this.cpf)
                 .contas(new ArrayList<Conta>())

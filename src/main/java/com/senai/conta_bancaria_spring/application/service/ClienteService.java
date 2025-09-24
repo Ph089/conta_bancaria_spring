@@ -22,9 +22,25 @@ public class ClienteService {
                 () -> repository.save(dto.toEntity())
         );
 
+        var contas = cliente.getContas();
+        var novaConta = dto.contaDTO().toEntity(cliente);
 
-            return null;
+        boolean jaTemTipo = contas.stream()
+                .anyMatch(c -> c.getClass().equals(novaConta.getClass()) && c.isAtiva());
+
+        if (jaTemTipo)
+            throw new RuntimeException("Cliente já possui uma conta ativa deste tipo");
+
+        cliente.getContas().add(novaConta);
+
+
+        return ClienteResponseDTO.fromEntity(repository.save(cliente));
         }
 
 
+    public List<ClienteResponseDTO> listarClientesAtivos() {
+        return repository.findAllByAtivoTrue().stream()
+                .map(ClienteResponseDTO::fromEntity)
+                .toList();
     }
+}
