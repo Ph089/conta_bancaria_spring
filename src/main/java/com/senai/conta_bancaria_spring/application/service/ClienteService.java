@@ -16,7 +16,7 @@ public class ClienteService {
 
     private final ClienteRepository repository;
 
-    public ClienteResponseDTO registrarClienteOuAnexarContaa(ClienteRegistroDTO dto) {
+    public ClienteResponseDTO registrarClienteOuAnexarConta(ClienteRegistroDTO dto) {
 
         var cliente = repository.findByCpfAndAtivoTrue(dto.cpf()).orElseGet(
                 () -> repository.save(dto.toEntity())
@@ -42,5 +42,34 @@ public class ClienteService {
         return repository.findAllByAtivoTrue().stream()
                 .map(ClienteResponseDTO::fromEntity)
                 .toList();
+    }
+
+    public ClienteResponseDTO buscarClienteAtivoPorCPF(String cpf) {
+        var cliente = repository.findByCpfAndAtivoTrue(cpf).orElseThrow(
+                () -> new RuntimeException("Cliente não encontrado")
+                );
+        return ClienteResponseDTO.fromEntity(cliente);
+    }
+
+    public ClienteResponseDTO atualizarCliente(String cpf, ClienteRegistroDTO dto) {
+        var cliente = repository.findByCpfAndAtivoTrue(cpf).orElseThrow(
+                () -> new RuntimeException("Cliente não encontrado")
+        );
+
+        cliente.setNome(dto.nome());
+        cliente.setCpf(dto.cpf());
+
+        return ClienteResponseDTO.fromEntity(repository.save(cliente));
+    }
+
+    public void deletarCliente(String cpf) {
+        var cliente = repository.findByCpfAndAtivoTrue(cpf).orElseThrow(
+                () -> new RuntimeException("Cliente não encontrado")
+        );
+        cliente.setAtivo(false);
+        cliente.getContas().forEach(
+                conta -> conta.setAtiva(false)
+        );
+        repository.save(cliente);
     }
 }
