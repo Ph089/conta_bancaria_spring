@@ -8,8 +8,8 @@ import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 
-@Data
 @Entity
+@Data
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "tipo_conta", discriminatorType = DiscriminatorType.STRING, length = 20)
 @Table(name = "conta",
@@ -21,7 +21,6 @@ import java.math.BigDecimal;
 @SuperBuilder
 @NoArgsConstructor
 public abstract class Conta {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -29,7 +28,7 @@ public abstract class Conta {
     @Column(nullable = false, length = 20)
     private String numero;
 
-    @Column(nullable = false, precision = 4, scale = 2)
+    @Column(nullable = false, precision = 20, scale = 2)
     private BigDecimal saldo;
 
     @Column(nullable = false)
@@ -41,11 +40,14 @@ public abstract class Conta {
 
     public abstract String getTipo();
 
-
+    public void sacar(BigDecimal valor) {
+        if (valor.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("O valor de saque deve ser maior que zero.");
+        }
+        if (this.saldo.compareTo(valor) < 0) {
+            throw new IllegalArgumentException("Saldo insuficiente para o saque.");
+        }
+        this.saldo = this.saldo.subtract(valor);
     }
-
-
-
-
-
+}
 

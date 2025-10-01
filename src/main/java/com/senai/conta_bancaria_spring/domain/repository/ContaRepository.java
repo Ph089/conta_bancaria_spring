@@ -3,7 +3,10 @@ package com.senai.conta_bancaria_spring.domain.repository;
 import com.senai.conta_bancaria_spring.domain.entity.Conta;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+import java.util.Optional;
+
 public interface ContaRepository extends JpaRepository<Conta, String> {
-    Conta findByNumeroAndAtivoTrue(String numero);
-    java.util.List<Conta> findAllByAtivoTrue();
+    Optional<Conta> findByNumeroAndAtivoTrue(String numero);
+    List<Conta> findAllByAtivoTrue();
 }
