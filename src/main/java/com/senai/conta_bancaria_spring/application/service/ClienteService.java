@@ -4,6 +4,7 @@ package com.senai.conta_bancaria_spring.application.service;
 import com.senai.conta_bancaria_spring.application.DTO.ClienteRegistroDTO;
 import com.senai.conta_bancaria_spring.application.DTO.ClienteResponseDTO;
 import com.senai.conta_bancaria_spring.domain.entity.Cliente;
+import com.senai.conta_bancaria_spring.domain.exceptions.EntidadeNaoEncontradoException;
 import com.senai.conta_bancaria_spring.domain.repository.ClienteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -46,14 +47,14 @@ public class ClienteService {
 
     public ClienteResponseDTO buscarClienteAtivoPorCPF(String cpf) {
         var cliente = repository.findByCpfAndAtivoTrue(cpf).orElseThrow(
-                () -> new RuntimeException("Cliente não encontrado")
+                () -> new EntidadeNaoEncontradoException("Conta")
                 );
         return ClienteResponseDTO.fromEntity(cliente);
     }
 
     public ClienteResponseDTO atualizarCliente(String cpf, ClienteRegistroDTO dto) {
         var cliente = repository.findByCpfAndAtivoTrue(cpf).orElseThrow(
-                () -> new RuntimeException("Cliente não encontrado")
+                () -> new EntidadeNaoEncontradoException("Conta")
         );
 
         cliente.setNome(dto.nome());
@@ -64,7 +65,7 @@ public class ClienteService {
 
     public void deletarCliente(String cpf) {
         var cliente = repository.findByCpfAndAtivoTrue(cpf).orElseThrow(
-                () -> new RuntimeException("Cliente não encontrado")
+                () -> new EntidadeNaoEncontradoException("Conta")
         );
         cliente.setAtivo(false);
         cliente.getContas().forEach(
