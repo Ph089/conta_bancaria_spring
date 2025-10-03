@@ -10,7 +10,6 @@ import com.senai.conta_bancaria_spring.domain.entity.ContaCorrente;
 import com.senai.conta_bancaria_spring.domain.entity.ContaPoupanca;
 import com.senai.conta_bancaria_spring.domain.exceptions.EntidadeNaoEncontradoException;
 import com.senai.conta_bancaria_spring.domain.exceptions.RendimentoInvalidoException;
-import com.senai.conta_bancaria_spring.domain.exceptions.TransferenciaParaMesmaContaException;
 import com.senai.conta_bancaria_spring.domain.repository.ContaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

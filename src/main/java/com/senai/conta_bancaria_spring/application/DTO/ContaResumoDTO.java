@@ -4,6 +4,8 @@ import com.senai.conta_bancaria_spring.domain.entity.Cliente;
 import com.senai.conta_bancaria_spring.domain.entity.Conta;
 import com.senai.conta_bancaria_spring.domain.entity.ContaCorrente;
 import com.senai.conta_bancaria_spring.domain.entity.ContaPoupanca;
+import com.senai.conta_bancaria_spring.domain.exceptions.EntidadeNaoEncontradoException;
+import com.senai.conta_bancaria_spring.domain.exceptions.TipoDeContaInvalidoException;
 
 import java.math.BigDecimal;
 
@@ -31,7 +33,7 @@ public record ContaResumoDTO(
                     .cliente(cliente)
                     .build();
         }
-        return null;
+        throw new TipoDeContaInvalidoException();
     }
     public static ContaResumoDTO fromEntity(Conta c) {
         return new ContaResumoDTO(
