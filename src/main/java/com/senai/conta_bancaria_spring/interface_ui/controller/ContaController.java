@@ -1,4 +1,4 @@
-package com.senai.conta_bancaria_spring.interface_ui;
+package com.senai.conta_bancaria_spring.interface_ui.controller;
 
 
 import com.senai.conta_bancaria_spring.application.DTO.ContaAtualizacaoDTO;
@@ -6,12 +6,10 @@ import com.senai.conta_bancaria_spring.application.DTO.ContaResumoDTO;
 import com.senai.conta_bancaria_spring.application.DTO.TransferenciaDTO;
 import com.senai.conta_bancaria_spring.application.DTO.ValorSaqueDepositoDTO;
 import com.senai.conta_bancaria_spring.application.service.ContaService;
-import com.senai.conta_bancaria_spring.domain.entity.Conta;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 

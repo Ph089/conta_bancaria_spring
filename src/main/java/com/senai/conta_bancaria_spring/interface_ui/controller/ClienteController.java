@@ -1,4 +1,4 @@
-package com.senai.conta_bancaria_spring.interface_ui;
+package com.senai.conta_bancaria_spring.interface_ui.controller;
 
 
 import com.senai.conta_bancaria_spring.application.DTO.ClienteRegistroDTO;
