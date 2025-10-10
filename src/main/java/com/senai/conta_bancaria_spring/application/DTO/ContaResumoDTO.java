@@ -6,12 +6,20 @@ import com.senai.conta_bancaria_spring.domain.entity.ContaCorrente;
 import com.senai.conta_bancaria_spring.domain.entity.ContaPoupanca;
 import com.senai.conta_bancaria_spring.domain.exceptions.EntidadeNaoEncontradoException;
 import com.senai.conta_bancaria_spring.domain.exceptions.TipoDeContaInvalidoException;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
 public record ContaResumoDTO(
+
+        @NotBlank
         String numero,
+
+        @NotBlank
         String tipo,
+
+        @NotNull
         BigDecimal saldo
 ) {
     public Conta toEntity(Cliente cliente){

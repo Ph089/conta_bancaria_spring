@@ -6,6 +6,7 @@ import com.senai.conta_bancaria_spring.application.DTO.ContaResumoDTO;
 import com.senai.conta_bancaria_spring.application.DTO.TransferenciaDTO;
 import com.senai.conta_bancaria_spring.application.DTO.ValorSaqueDepositoDTO;
 import com.senai.conta_bancaria_spring.application.service.ContaService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,12 +46,12 @@ public class ContaController {
 
     @PostMapping("/{numeroConta}/sacar")
     public ResponseEntity<ContaResumoDTO> sacar(@PathVariable String numeroConta,
-                                                @RequestBody ValorSaqueDepositoDTO dto) {
+                                                @Valid @RequestBody ValorSaqueDepositoDTO dto) {
         return ResponseEntity.ok(service.sacar(numeroConta, dto));
     }
     @PostMapping("/{numeroConta}/depositar")
     public ResponseEntity<ContaResumoDTO> depositar(@PathVariable String numeroConta,
-                                                    @RequestBody ValorSaqueDepositoDTO dto) {
+                                                    @Valid @RequestBody ValorSaqueDepositoDTO dto) {
         return ResponseEntity.ok(service.depositar(numeroConta, dto));
     }
 
