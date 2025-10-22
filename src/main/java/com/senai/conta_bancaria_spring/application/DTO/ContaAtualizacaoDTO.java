@@ -7,10 +7,15 @@ import java.math.BigDecimal;
 public record ContaAtualizacaoDTO(
 
         @NotNull
-
         BigDecimal saldo,
+
+        @NotNull
         BigDecimal limite,
+
+        @NotNull
         BigDecimal rendimento,
+
+        @NotNull
         BigDecimal taxa
 
 ) {

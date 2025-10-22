@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface GerenteRepository extends JpaRepository<Gerente, String> {
     Optional<Gerente> findByEmail(String email);
+
 }

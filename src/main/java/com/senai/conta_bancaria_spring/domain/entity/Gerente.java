@@ -18,11 +18,12 @@ public class Gerente extends Usuario {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name="gerente", joinColumns=@JoinColumn(name="gerente_id"))
-    @Column(name="turma")
-    private List<String > listaDeTurmas;
+    @Column(name="agencia")
+    private List<String> listaDeAgencias;
+
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name="gerente", joinColumns=@JoinColumn(name="gerente_id"))
-    @Column(name="uc")
-    private List<String> listaDeUC;
+    @Column(name="departamento")
+    private List<String> departamentos;
 }
