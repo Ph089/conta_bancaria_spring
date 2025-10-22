@@ -8,6 +8,9 @@ import com.senai.conta_bancaria_spring.domain.exceptions.ContaMesmoTipoException
 import com.senai.conta_bancaria_spring.domain.exceptions.EntidadeNaoEncontradoException;
 import com.senai.conta_bancaria_spring.domain.repository.ClienteRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -48,11 +51,13 @@ public class ClienteService {
 
     public ClienteResponseDTO buscarClienteAtivoPorCPF(String cpf) {
         var cliente = buscarPorCpfClienteAtivo(cpf);
+        validarDonoDoCpfOuAdmin(cliente);
         return ClienteResponseDTO.fromEntity(cliente);
     }
 
     public ClienteResponseDTO atualizarCliente(String cpf, ClienteRegistroDTO dto) {
         var cliente = buscarPorCpfClienteAtivo(cpf);
+        validarDonoDoCpfOuAdmin(cliente);
 
         cliente.setNome(dto.nome());
         cliente.setCpf(dto.cpf());
@@ -62,6 +67,8 @@ public class ClienteService {
 
     public void deletarCliente(String cpf) {
         var cliente = buscarPorCpfClienteAtivo(cpf);
+        validarDonoDoCpfOuAdmin(cliente);
+
         cliente.setAtivo(false);
         cliente.getContas().forEach(
                 conta -> conta.setAtiva(false)
@@ -74,6 +81,22 @@ public class ClienteService {
                 () -> new EntidadeNaoEncontradoException("Conta")
         );
         return cliente;
+    }
+    // --- NOVO MÉTODO PRIVADO DE VALIDAÇÃO ---
+    private void validarDonoDoCpfOuAdmin(Cliente cliente) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            throw new AccessDeniedException("Usuário não autenticado.");
+        }
+
+        String emailUsuarioLogado = authentication.getName();
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN"));
+
+        // Se NÃO for Admin E o email do cliente for DIFERENTE do email do usuário logado
+        if (!isAdmin && !cliente.getEmail().equals(emailUsuarioLogado)) {
+            throw new AccessDeniedException("Acesso negado: Você não pode alterar dados de outro cliente.");
+        }
     }
 
 }

@@ -12,6 +12,9 @@ import com.senai.conta_bancaria_spring.domain.exceptions.EntidadeNaoEncontradoEx
 import com.senai.conta_bancaria_spring.domain.exceptions.RendimentoInvalidoException;
 import com.senai.conta_bancaria_spring.domain.repository.ContaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,14 +35,17 @@ public class ContaService {
 
     @Transactional(readOnly = true)
     public ContaResumoDTO buscarContaPorNumero(String numero) {
-        return ContaResumoDTO.fromEntity(
-                repository.findByNumeroAndAtivaTrue(numero)
-                        .orElseThrow(() -> new EntidadeNaoEncontradoException("Conta"))
-        );
+        var conta = repository.findByNumeroAndAtivaTrue(numero)
+                .orElseThrow(() -> new EntidadeNaoEncontradoException("Conta"));
+
+        validarDonoDaContaOuAdmin(conta);
+
+        return ContaResumoDTO.fromEntity(conta);
     }
 
     public ContaResumoDTO atualizarConta(String numeroConta, ContaAtualizacaoDTO dto) {
         var conta = buscaContaAtivaPorNumero(numeroConta);
+        validarDonoDaContaOuAdmin(conta);
 
         if(conta instanceof ContaPoupanca poupanca){
             poupanca.setRendimento(dto.rendimento());
@@ -52,6 +58,7 @@ public class ContaService {
     }
     public void deletarConta(String numeroDaConta) {
         var conta = buscaContaAtivaPorNumero(numeroDaConta);
+        validarDonoDaContaOuAdmin(conta);
         conta.setAtiva(false);
         repository.save(conta);
     }
@@ -63,17 +70,28 @@ public class ContaService {
 
     public ContaResumoDTO sacar(String numeroConta, ValorSaqueDepositoDTO dto) {
         var conta = buscaContaAtivaPorNumero(numeroConta);
+
+        validarDonoDaConta(conta); // <-- MUDANÇA: Chama o novo método (sem admin)
+
         conta.sacar(dto.valor());
         return ContaResumoDTO.fromEntity(repository.save(conta));
     }
+
     public ContaResumoDTO depositar(String numeroConta, ValorSaqueDepositoDTO dto) {
         var conta = buscaContaAtivaPorNumero(numeroConta);
+
+        validarDonoDaConta(conta); // <-- MUDANÇA: Chama o novo método (sem admin)
+
         conta.depositar(dto.valor());
         return ContaResumoDTO.fromEntity(repository.save(conta));
     }
 
     public ContaResumoDTO transferir(String numeroConta, TransferenciaDTO dto) {
         var contaOrigem = buscaContaAtivaPorNumero(numeroConta);
+
+        // VERIFICAÇÃO IMPORTANTE: Só pode transferir se for dono da conta de ORIGEM
+        validarDonoDaConta(contaOrigem); // <-- MUDANÇA: Chama o novo método (sem admin)
+
         var contaDestino = buscaContaAtivaPorNumero(dto.contaDestino());
 
         contaOrigem.transferir(dto.valor(), contaDestino);
@@ -84,10 +102,46 @@ public class ContaService {
 
     public ContaResumoDTO aplicarRendimento(String numeroDaConta) {
         var conta = buscaContaAtivaPorNumero(numeroDaConta);
-        if(conta instanceof ContaPoupanca poupanca){
+
+        validarDonoDaConta(conta); // <-- MUDANÇA: Chama o novo método (sem admin)
+
+        if (conta instanceof ContaPoupanca poupanca) {
             poupanca.aplicarRendimento();
             return ContaResumoDTO.fromEntity(repository.save(conta));
         }
         throw new RendimentoInvalidoException();
+    }
+
+    // MÉTODO ANTIGO (Permite Admin) - MANTENHA ELE
+    // Ele ainda é usado por buscarContaPorNumero, atualizarConta e deletarConta
+    private void validarDonoDaContaOuAdmin(Conta conta) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            throw new AccessDeniedException("Usuário não autenticado.");
+        }
+
+        String emailUsuarioLogado = authentication.getName();
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isAdmin && !conta.getCliente().getEmail().equals(emailUsuarioLogado)) {
+            throw new AccessDeniedException("Acesso negado: Esta conta não pertence ao usuário logado.");
+        }
+    }
+
+    // --- NOVO MÉTODO PRIVADO (Apenas Cliente) ---
+    private void validarDonoDaConta(Conta conta) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            throw new AccessDeniedException("Usuário não autenticado.");
+        }
+
+        String emailUsuarioLogado = authentication.getName();
+
+        // Se o email do dono da conta for DIFERENTE do email do usuário logado
+        if (!conta.getCliente().getEmail().equals(emailUsuarioLogado)) {
+            // Não há verificação "isAdmin" aqui
+            throw new AccessDeniedException("Acesso negado: Esta conta não pertence ao usuário logado.");
+        }
     }
 }

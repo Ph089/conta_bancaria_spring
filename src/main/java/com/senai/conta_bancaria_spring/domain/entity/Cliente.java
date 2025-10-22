@@ -13,8 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @SuperBuilder
 @Table(
-        name = "cliente",
-        uniqueConstraints = @UniqueConstraint(name = "uk_cliente_cpf", columnNames = "cpf")
+        name = "cliente"
 )
 public class Cliente extends Usuario{
 
