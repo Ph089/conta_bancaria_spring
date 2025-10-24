@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,11 +21,20 @@ import java.util.List;
 public class ClienteService {
 
     private final ClienteRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
     public ClienteResponseDTO registrarClienteOuAnexarConta(ClienteRegistroDTO dto) {
 
+
+        String senhaPura = dto.senha();
+        String senhaCodificada = passwordEncoder.encode(senhaPura);
+
         var cliente = repository.findByCpfAndAtivoTrue(dto.cpf()).orElseGet(
-                () -> repository.save(dto.toEntity())
+                () -> {
+                    Cliente novoCliente = dto.toEntity();
+                    novoCliente.setSenha(senhaCodificada);
+                    return repository.save(novoCliente);
+                }
         );
 
         var contas = cliente.getContas();
@@ -38,10 +48,8 @@ public class ClienteService {
 
         cliente.getContas().add(novaConta);
 
-
         return ClienteResponseDTO.fromEntity(repository.save(cliente));
-        }
-
+    }
 
     public List<ClienteResponseDTO> listarClientesAtivos() {
         return repository.findAllByAtivoTrue().stream()
