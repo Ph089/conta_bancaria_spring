@@ -4,7 +4,7 @@ import com.senai.conta_bancaria_spring.domain.entity.Cliente;
 import com.senai.conta_bancaria_spring.domain.entity.Conta;
 import com.senai.conta_bancaria_spring.domain.entity.ContaCorrente;
 import com.senai.conta_bancaria_spring.domain.entity.ContaPoupanca;
-import com.senai.conta_bancaria_spring.domain.exceptions.EntidadeNaoEncontradoException;
+import io.swagger.v3.oas.annotations.media.Schema;
 import com.senai.conta_bancaria_spring.domain.exceptions.TipoDeContaInvalidoException;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,12 +14,15 @@ import java.math.BigDecimal;
 public record ContaResumoDTO(
 
         @NotBlank
+        @Schema(description = "Número único da conta", example = "12345-6")
         String numero,
 
         @NotBlank
+        @Schema(description = "Tipo da conta", example = "CORRENTE")
         String tipo,
 
         @NotNull
+        @Schema(description = "Saldo atual da conta", example = "1500.75")
         BigDecimal saldo
 ) {
     public Conta toEntity(Cliente cliente){
