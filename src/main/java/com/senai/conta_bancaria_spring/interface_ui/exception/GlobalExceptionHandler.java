@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ContaMesmoTipoException.class)
     public ProblemDetail handleContaMesmoTipo(ContaMesmoTipoException ex,
-                                                    HttpServletRequest request) {
+                                              HttpServletRequest request) {
         return ProblemDetailUtils.buildProblem(
                 HttpStatus.CONFLICT,
                 "Não é possível criar uma conta do mesmo tipo para o mesmo cliente.",
@@ -99,6 +99,7 @@ public class GlobalExceptionHandler {
         );
 
     }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail badRequest(MethodArgumentNotValidException ex, HttpServletRequest request) {
         ProblemDetail problem = ProblemDetailUtils.buildProblem(
@@ -119,6 +120,7 @@ public class GlobalExceptionHandler {
         problem.setProperty("errors", errors);
         return problem;
     }
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ProblemDetail handleTypeMismatch(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
@@ -132,6 +134,7 @@ public class GlobalExceptionHandler {
         problem.setInstance(URI.create(request.getRequestURI()));
         return problem;
     }
+
     @ExceptionHandler(ConversionFailedException.class)
     public ProblemDetail handleConversionFailed(ConversionFailedException ex, HttpServletRequest request) {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
@@ -157,6 +160,29 @@ public class GlobalExceptionHandler {
         });
         problem.setProperty("errors", errors);
         return problem;
+
+
+    }
+
+
+    @ExceptionHandler(PagamentoInvalidoException.class)
+    public ProblemDetail handlePagamentoInvalido(PagamentoInvalidoException ex, HttpServletRequest request) {
+        return ProblemDetailUtils.buildProblem(
+                HttpStatus.BAD_REQUEST, // 400
+                "Pagamento Inválido",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+    }
+
+    @ExceptionHandler(AutenticacaoIoTExpiradaException.class)
+    public ProblemDetail handleIoTExpirado(AutenticacaoIoTExpiradaException ex, HttpServletRequest request) {
+        return ProblemDetailUtils.buildProblem(
+                HttpStatus.REQUEST_TIMEOUT, // 408
+                "Tempo Excedido",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
     }
 }
 
