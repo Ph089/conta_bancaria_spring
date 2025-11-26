@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -71,7 +72,7 @@ public class ContaService {
     public ContaResumoDTO sacar(String numeroConta, ValorSaqueDepositoDTO dto) {
         var conta = buscaContaAtivaPorNumero(numeroConta);
 
-        validarDonoDaConta(conta); // <-- MUDANÇA: Chama o novo método (sem admin)
+        validarDonoDaConta(conta);
 
         conta.sacar(dto.valor());
         return ContaResumoDTO.fromEntity(repository.save(conta));
@@ -80,7 +81,7 @@ public class ContaService {
     public ContaResumoDTO depositar(String numeroConta, ValorSaqueDepositoDTO dto) {
         var conta = buscaContaAtivaPorNumero(numeroConta);
 
-        validarDonoDaConta(conta); // <-- MUDANÇA: Chama o novo método (sem admin)
+        validarDonoDaConta(conta);
 
         conta.depositar(dto.valor());
         return ContaResumoDTO.fromEntity(repository.save(conta));
@@ -89,8 +90,7 @@ public class ContaService {
     public ContaResumoDTO transferir(String numeroConta, TransferenciaDTO dto) {
         var contaOrigem = buscaContaAtivaPorNumero(numeroConta);
 
-        // VERIFICAÇÃO IMPORTANTE: Só pode transferir se for dono da conta de ORIGEM
-        validarDonoDaConta(contaOrigem); // <-- MUDANÇA: Chama o novo método (sem admin)
+        validarDonoDaConta(contaOrigem);
 
         var contaDestino = buscaContaAtivaPorNumero(dto.contaDestino());
 
@@ -103,7 +103,7 @@ public class ContaService {
     public ContaResumoDTO aplicarRendimento(String numeroDaConta) {
         var conta = buscaContaAtivaPorNumero(numeroDaConta);
 
-        validarDonoDaConta(conta); // <-- MUDANÇA: Chama o novo método (sem admin)
+        validarDonoDaConta(conta);
 
         if (conta instanceof ContaPoupanca poupanca) {
             poupanca.aplicarRendimento();
@@ -113,7 +113,6 @@ public class ContaService {
     }
 
     // MÉTODO ANTIGO (Permite Admin) - MANTENHA ELE
-    // Ele ainda é usado por buscarContaPorNumero, atualizarConta e deletarConta
     private void validarDonoDaContaOuAdmin(Conta conta) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
@@ -138,10 +137,12 @@ public class ContaService {
 
         String emailUsuarioLogado = authentication.getName();
 
-        // Se o email do dono da conta for DIFERENTE do email do usuário logado
         if (!conta.getCliente().getEmail().equals(emailUsuarioLogado)) {
-            // Não há verificação "isAdmin" aqui
+
             throw new AccessDeniedException("Acesso negado: Esta conta não pertence ao usuário logado.");
         }
+    }
+
+    public void efetivarSaqueInterno(String contaOrigem, BigDecimal valor) {
     }
 }

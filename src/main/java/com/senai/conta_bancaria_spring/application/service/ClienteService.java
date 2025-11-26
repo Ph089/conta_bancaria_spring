@@ -101,7 +101,7 @@ public class ClienteService {
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN"));
 
-        // Se NÃO for Admin E o email do cliente for DIFERENTE do email do usuário logado
+
         if (!isAdmin && !cliente.getEmail().equals(emailUsuarioLogado)) {
             throw new AccessDeniedException("Acesso negado: Você não pode alterar dados de outro cliente.");
         }

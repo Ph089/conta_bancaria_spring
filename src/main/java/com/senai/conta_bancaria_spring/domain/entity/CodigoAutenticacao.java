@@ -18,16 +18,16 @@ public class CodigoAutenticacao {
     private String id;
 
     @Column(nullable = false)
-    private String codigo; // O número gerado (ex: "482910")
+    private String codigo;
 
     @Column(nullable = false)
-    private LocalDateTime expiraEm; // Para validar se o tempo (ex: 5 min) já passou
+    private LocalDateTime expiraEm;
 
     @Builder.Default
     @Column(nullable = false)
-    private Boolean validado = false; // Muda para true quando o IoT confirma
+    private Boolean validado = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id", nullable = false)
-    private Cliente cliente; // A quem pertence este código
+    private Cliente cliente;
 }
