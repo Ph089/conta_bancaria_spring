@@ -51,6 +51,11 @@ public class SecurityConfig {
                         // Apenas o CLIENTE pode acessar estas rotas
                         .requestMatchers(HttpMethod.POST, "/api/conta/{numeroConta}/**").hasRole("CLIENTE")
 
+                                .requestMatchers(HttpMethod.POST, "/api/pagamentos/**").hasRole("CLIENTE")
+
+                                .requestMatchers(HttpMethod.POST, "/api/taxas").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/taxas").hasAnyRole("ADMIN", "CLIENTE")
+
                         .anyRequest().authenticated()
                 )
 

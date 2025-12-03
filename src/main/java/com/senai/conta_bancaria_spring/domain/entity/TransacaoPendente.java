@@ -23,7 +23,7 @@ public class TransacaoPendente {
     // Dados específicos para pagamento
     private String codigoBoleto;
 
-    // Dados específicos para saque/transferencia
+
     private String contaOrigem;
 
     private LocalDateTime dataCriacao;
