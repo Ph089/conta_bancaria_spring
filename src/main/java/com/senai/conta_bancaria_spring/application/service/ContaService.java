@@ -36,8 +36,7 @@ public class ContaService {
 
     @Transactional(readOnly = true)
     public ContaResumoDTO buscarContaPorNumero(String numero) {
-        var conta = repository.findByNumeroAndAtivaTrue(numero)
-                .orElseThrow(() -> new EntidadeNaoEncontradoException("Conta"));
+        var conta = buscaContaAtivaPorNumero(numero);
 
         validarDonoDaContaOuAdmin(conta);
 
@@ -141,8 +140,5 @@ public class ContaService {
 
             throw new AccessDeniedException("Acesso negado: Esta conta não pertence ao usuário logado.");
         }
-    }
-
-    public void efetivarSaqueInterno(String contaOrigem, BigDecimal valor) {
     }
 }

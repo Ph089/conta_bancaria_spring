@@ -65,7 +65,7 @@ public class ClienteController {
             }
     )
     @PostMapping
-    public ResponseEntity registrarCliente(@org.springframework.web.bind.annotation.RequestBody ClienteRegistroDTO dto) {
+    public ResponseEntity<ClienteResponseDTO> registrarCliente(@org.springframework.web.bind.annotation.RequestBody ClienteRegistroDTO dto) {
         ClienteResponseDTO novoCliente = service.registrarClienteOuAnexarConta(dto);
         return ResponseEntity.created(
                 URI.create("/api/cliente//cpf" + novoCliente.cpf())

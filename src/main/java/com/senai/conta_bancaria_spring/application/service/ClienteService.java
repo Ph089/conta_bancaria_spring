@@ -85,10 +85,9 @@ public class ClienteService {
     }
 
     private Cliente buscarPorCpfClienteAtivo(String cpf) {
-        var cliente = repository.findByCpfAndAtivoTrue(cpf).orElseThrow(
+        return repository.findByCpfAndAtivoTrue(cpf).orElseThrow(
                 () -> new EntidadeNaoEncontradoException("Conta")
         );
-        return cliente;
     }
     // --- NOVO MÉTODO PRIVADO DE VALIDAÇÃO ---
     private void validarDonoDoCpfOuAdmin(Cliente cliente) {
